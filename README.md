@@ -1,47 +1,26 @@
-# Material UI - Next.js App Router example
+# Overwatch Gradient Generator
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped using [`create-next-app`](https://github.com/vercel/next.js/tree/HEAD/packages/create-next-app) with Material UI installed.
+This project is a small demo built with **Next.js** and **Material UI**. It lets you create chat messages for Overwatch with colorful gradients and icons. Messages can be saved locally so you can reuse them later.
 
-## How to use
+## Features
 
-Download the example [or clone the repo](https://github.com/mui/material-ui):
+- Select start and end colors for the gradient.
+- Insert Overwatch icons from the included list.
+- Basic internationalization: English, Español and Català.
+- Copy the generated code or save it to your browser favorites.
+- Manage your saved messages from the favorites menu.
 
-<!-- #target-branch-reference -->
+## Development
 
-```bash
-curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2  material-ui-master/examples/material-ui-nextjs
-cd material-ui-nextjs
-```
-
-Install it and run:
+Install the dependencies and start the dev server:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-or:
+## License
 
-<!-- #target-branch-reference -->
-
-[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/mui/material-ui/tree/master/examples/material-ui-nextjs)
-
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/mui/material-ui/tree/master/examples/material-ui-nextjs)
-
-## Learn more
-
-To learn more about this example:
-
-<!-- #host-reference -->
-
-- [Next.js documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Customizing Material UI](https://mui.com/material-ui/customization/how-to-customize/) - approaches to customizing Material UI.
-
-## What's next?
-
-<!-- #host-reference -->
-
-You now have a working example project.
-You can head back to the documentation and continue by browsing the [templates](https://mui.com/material-ui/getting-started/templates/) section.
+The icon list was provided by **@spinsp7** on X. This project itself is provided as-is for educational purposes.
