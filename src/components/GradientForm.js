@@ -21,6 +21,7 @@ import StarIcon from '@mui/icons-material/Star';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { messages } from '@/i18n';
+import { ColorModeContext } from '@/theme';
 
 function hexToRgb(hex) {
   const h = hex.replace('#', '');
@@ -38,7 +39,7 @@ function rgbToHex(r, g, b) {
     .toUpperCase();
 }
 
-function generateGradient(text, start, end, opacity) {
+function generateGradient(text, start, end, startOpacity, endOpacity) {
   const s = hexToRgb(start);
   const e = hexToRgb(end);
   const len = text.length;
@@ -57,7 +58,10 @@ function generateGradient(text, start, end, opacity) {
     const g = Math.round(s.g + (e.g - s.g) * t);
     const b = Math.round(s.b + (e.b - s.b) * t);
     const hex = rgbToHex(r, g, b);
-    const op = opacity.toString(16).padStart(2, '0').toUpperCase();
+    const opVal = Math.round(
+      startOpacity + (endOpacity - startOpacity) * t,
+    );
+    const op = opVal.toString(16).padStart(2, '0').toUpperCase();
     result += `<FG${hex}${op}>` + text[i];
   }
   return result;
@@ -66,10 +70,12 @@ function generateGradient(text, start, end, opacity) {
 export default function GradientForm({ categories }) {
   const [lang, setLang] = useState('en');
   const t = messages[lang];
+  const colorMode = React.useContext(ColorModeContext);
   const [message, setMessage] = useState('');
   const [startColor, setStartColor] = useState('#ff0000');
   const [endColor, setEndColor] = useState('#0000ff');
-  const [opacity, setOpacity] = useState(255);
+  const [startOpacity, setStartOpacity] = useState(255);
+  const [endOpacity, setEndOpacity] = useState(255);
   const [code, setCode] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -82,15 +88,30 @@ export default function GradientForm({ categories }) {
   }, []);
 
   useEffect(() => {
-    setCode(generateGradient(message, startColor, endColor, opacity));
-  }, [message, startColor, endColor, opacity]);
+    setCode(
+      generateGradient(
+        message,
+        startColor,
+        endColor,
+        startOpacity,
+        endOpacity,
+      ),
+    );
+  }, [message, startColor, endColor, startOpacity, endOpacity]);
 
   const handleCopy = () => navigator.clipboard.writeText(code);
 
   const handleSave = () => {
     const newFav = [
       ...favorites,
-      { id: Date.now(), message, startColor, endColor, opacity },
+      {
+        id: Date.now(),
+        message,
+        startColor,
+        endColor,
+        startOpacity,
+        endOpacity,
+      },
     ];
     setFavorites(newFav);
     localStorage.setItem('owFavorites', JSON.stringify(newFav));
@@ -100,8 +121,11 @@ export default function GradientForm({ categories }) {
     setMessage(fav.message);
     setStartColor(fav.startColor);
     setEndColor(fav.endColor);
-    if (typeof fav.opacity === 'number') {
-      setOpacity(fav.opacity);
+    if (typeof fav.startOpacity === 'number') {
+      setStartOpacity(fav.startOpacity);
+    }
+    if (typeof fav.endOpacity === 'number') {
+      setEndOpacity(fav.endOpacity);
     }
     setAnchorEl(null);
   };
@@ -117,7 +141,7 @@ export default function GradientForm({ categories }) {
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-        <FormControl sx={{ mb: 2, minWidth: 120 }} size="small">
+        <FormControl sx={{ mb: 2, minWidth: 120, mr: 2 }} size="small">
           <InputLabel id="lang-label">Lang</InputLabel>
           <Select
             labelId="lang-label"
@@ -128,6 +152,19 @@ export default function GradientForm({ categories }) {
             <MenuItem value="en">English</MenuItem>
             <MenuItem value="es">Español</MenuItem>
             <MenuItem value="ca">Català</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ mb: 2, minWidth: 120 }} size="small">
+          <InputLabel id="theme-label">{t.theme}</InputLabel>
+          <Select
+            labelId="theme-label"
+            value={colorMode.mode}
+            label={t.theme}
+            onChange={(e) => colorMode.setMode(e.target.value)}
+          >
+            <MenuItem value="system">{t.system}</MenuItem>
+            <MenuItem value="light">{t.light}</MenuItem>
+            <MenuItem value="dark">{t.dark}</MenuItem>
           </Select>
         </FormControl>
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -144,29 +181,59 @@ export default function GradientForm({ categories }) {
         />
         <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <TextField
-              type="color"
-              label={t.startColor}
-              value={startColor}
-              onChange={(e) => setStartColor(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-            <Box sx={{ width: 48, height: 48, bgcolor: startColor, border: 1, borderColor: 'divider' }} />
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={
+                <Box sx={{ width: 16, height: 16, bgcolor: startColor, border: 1, borderColor: 'divider' }} />
+              }
+            >
+              {t.startColor}
+              <input
+                type="color"
+                hidden
+                value={startColor}
+                onChange={(e) => setStartColor(e.target.value)}
+              />
+            </Button>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <TextField
-              type="color"
-              label={t.endColor}
-              value={endColor}
-              onChange={(e) => setEndColor(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-            <Box sx={{ width: 48, height: 48, bgcolor: endColor, border: 1, borderColor: 'divider' }} />
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={
+                <Box sx={{ width: 16, height: 16, bgcolor: endColor, border: 1, borderColor: 'divider' }} />
+              }
+            >
+              {t.endColor}
+              <input
+                type="color"
+                hidden
+                value={endColor}
+                onChange={(e) => setEndColor(e.target.value)}
+              />
+            </Button>
           </Box>
         </Box>
-        <Box sx={{ mb: 2 }}>
-          <Typography gutterBottom>{t.opacity}</Typography>
-          <Slider value={opacity} min={0} max={255} onChange={(e, v) => setOpacity(v)} />
+        <Box sx={{ mb: 2, display: 'flex', gap: 4 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography gutterBottom>{t.startOpacity}</Typography>
+            <Slider
+              value={startOpacity}
+              min={0}
+              max={255}
+              onChange={(e, v) => setStartOpacity(v)}
+            />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography gutterBottom>{t.endOpacity}</Typography>
+            <Slider
+              value={endOpacity}
+              min={0}
+              max={255}
+              onChange={(e, v) => setEndOpacity(v)}
+            />
+          </Box>
         </Box>
         <Grid container spacing={2} sx={{ mb: 2, flexWrap: 'nowrap', overflowX: 'auto' }}>
           {Object.entries(categories).map(([cat, items]) => (
@@ -251,7 +318,10 @@ export default function GradientForm({ categories }) {
                     fav.message,
                     fav.startColor,
                     fav.endColor,
-                    typeof fav.opacity === 'number' ? fav.opacity : 255
+                    typeof fav.startOpacity === 'number'
+                      ? fav.startOpacity
+                      : 255,
+                    typeof fav.endOpacity === 'number' ? fav.endOpacity : 255,
                   )
                 )
               }
