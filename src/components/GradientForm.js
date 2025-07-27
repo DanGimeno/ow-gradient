@@ -13,8 +13,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Slider,
-  InputAdornment,
+  Slider
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -23,6 +22,7 @@ import { messages } from "@/i18n";
 import { ColorModeContext } from "@/theme";
 import TranslateIcon from "@mui/icons-material/Translate";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
+import ColorPickerCustom from "./ColorPickerCustom";
 
 function hexToRgb(hex) {
   const h = hex.replace("#", "");
@@ -190,41 +190,10 @@ export default function GradientForm({ categories }) {
               }}
             />
             <CardContent>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                <Button
-                  variant="outlined"
-                  component="label"
-                  startIcon={
-                    <Box
-                      sx={{
-                        width: 16,
-                        height: 16,
-                        bgcolor: startColor,
-                        border: 1,
-                        borderColor: "divider",
-                      }}
-                    />
-                  }
-                >
-                  {t.startColor}
-                  <input
-                    type="color"
-                    hidden
-                    value={startColor}
-                    onChange={(e) => setStartColor(e.target.value)}
-                  />
-                </Button>
-                <TextField
-                  size="small"
-                  value={startColor.slice(1).toUpperCase()}
-                  InputProps={{
-                    readOnly: true,
-                    startAdornment: (
-                      <InputAdornment position="start">#</InputAdornment>
-                    ),
-                  }}
+              <Box sx={{ mb: 1 }}>
+                <ColorPickerCustom
+                  value={startColor}
+                  onChange={setStartColor}
                 />
               </Box>
               <Typography gutterBottom>{t.opacity}</Typography>
@@ -250,42 +219,8 @@ export default function GradientForm({ categories }) {
               }}
             />
             <CardContent>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                <Button
-                  variant="outlined"
-                  component="label"
-                  startIcon={
-                    <Box
-                      sx={{
-                        width: 16,
-                        height: 16,
-                        bgcolor: endColor,
-                        border: 1,
-                        borderColor: "divider",
-                      }}
-                    />
-                  }
-                >
-                  {t.endColor}
-                  <input
-                    type="color"
-                    hidden
-                    value={endColor}
-                    onChange={(e) => setEndColor(e.target.value)}
-                  />
-                </Button>
-                <TextField
-                  size="small"
-                  value={endColor.slice(1).toUpperCase()}
-                  InputProps={{
-                    readOnly: true,
-                    startAdornment: (
-                      <InputAdornment position="start">#</InputAdornment>
-                    ),
-                  }}
-                />
+              <Box sx={{ mb: 1 }}>
+                <ColorPickerCustom value={endColor} onChange={setEndColor} />
               </Box>
               <Typography gutterBottom>{t.opacity}</Typography>
               <Slider
