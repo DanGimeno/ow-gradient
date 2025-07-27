@@ -7,12 +7,14 @@ import {
   Button,
   Card,
   CardContent,
+  CardHeader,
   Typography,
   Grid,
   IconButton,
   Menu,
   MenuItem,
   Slider,
+  InputAdornment,
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -180,70 +182,115 @@ export default function GradientForm({ categories }) {
             error || `${iconCount} ${t.icons}, ${charCount}/${charLimit} ${t.chars}`
           }
         />
-        <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={
-                <Box sx={{ width: 16, height: 16, bgcolor: startColor, border: 1, borderColor: 'divider' }} />
-              }
-            >
-              {t.startColor}
-              <input
-                type="color"
-                hidden
-                value={startColor}
-                onChange={(e) => setStartColor(e.target.value)}
-              />
-            </Button>
-          </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={
-                <Box sx={{ width: 16, height: 16, bgcolor: endColor, border: 1, borderColor: 'divider' }} />
-              }
-            >
-              {t.endColor}
-              <input
-                type="color"
-                hidden
-                value={endColor}
-                onChange={(e) => setEndColor(e.target.value)}
-              />
-            </Button>
-          </Box>
-        </Box>
-        <Box sx={{ mb: 2, display: 'flex', gap: 4 }}>
-          <Box sx={{ flex: 1 }}>
-            <Typography gutterBottom>{t.startOpacity}</Typography>
-            <Slider
-              value={startOpacity}
-              min={0}
-              max={255}
-              onChange={(e, v) => setStartOpacity(v)}
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <Card sx={{ flex: 1, border: 1, borderColor: 'primary.main' }} elevation={0}>
+            <CardHeader
+              title={t.startColor}
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                p: 1,
+                textAlign: 'center',
+              }}
             />
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Typography gutterBottom>{t.endOpacity}</Typography>
-            <Slider
-              value={endOpacity}
-              min={0}
-              max={255}
-              onChange={(e, v) => setEndOpacity(v)}
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  startIcon={
+                    <Box sx={{ width: 16, height: 16, bgcolor: startColor, border: 1, borderColor: 'divider' }} />
+                  }
+                >
+                  {t.startColor}
+                  <input
+                    type="color"
+                    hidden
+                    value={startColor}
+                    onChange={(e) => setStartColor(e.target.value)}
+                  />
+                </Button>
+                <TextField
+                  size="small"
+                  value={startColor.slice(1).toUpperCase()}
+                  InputProps={{
+                    readOnly: true,
+                    startAdornment: <InputAdornment position="start">#</InputAdornment>,
+                  }}
+                />
+              </Box>
+              <Typography gutterBottom>{t.opacity}</Typography>
+              <Slider
+                value={startOpacity}
+                min={0}
+                max={255}
+                onChange={(e, v) => setStartOpacity(v)}
+              />
+            </CardContent>
+          </Card>
+          <Card sx={{ flex: 1, border: 1, borderColor: 'primary.main' }} elevation={0}>
+            <CardHeader
+              title={t.endColor}
+              sx={{
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                p: 1,
+                textAlign: 'center',
+              }}
             />
-          </Box>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  startIcon={
+                    <Box sx={{ width: 16, height: 16, bgcolor: endColor, border: 1, borderColor: 'divider' }} />
+                  }
+                >
+                  {t.endColor}
+                  <input
+                    type="color"
+                    hidden
+                    value={endColor}
+                    onChange={(e) => setEndColor(e.target.value)}
+                  />
+                </Button>
+                <TextField
+                  size="small"
+                  value={endColor.slice(1).toUpperCase()}
+                  InputProps={{
+                    readOnly: true,
+                    startAdornment: <InputAdornment position="start">#</InputAdornment>,
+                  }}
+                />
+              </Box>
+              <Typography gutterBottom>{t.opacity}</Typography>
+              <Slider
+                value={endOpacity}
+                min={0}
+                max={255}
+                onChange={(e, v) => setEndOpacity(v)}
+              />
+            </CardContent>
+          </Card>
         </Box>
         <Grid container spacing={2} sx={{ mb: 2, flexWrap: 'nowrap', overflowX: 'auto' }}>
           {Object.entries(categories).map(([cat, items]) => (
-            <Grid item xs={3} key={cat}>
-              <Card sx={{ height: '100%' }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {cat}
-                  </Typography>
+            <Grid item key={cat} sx={{ flex: '0 0 auto' }}>
+              <Card
+                sx={{ height: '100%', width: 200, border: 1, borderColor: 'primary.main' }}
+                elevation={0}
+              >
+                <CardHeader
+                  title={cat}
+                  sx={{
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                    p: 1,
+                    textAlign: 'center',
+                  }}
+                />
+                <CardContent sx={{ pt: 1 }}>
                   <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
                     {items.map((item) => (
                       <Button
