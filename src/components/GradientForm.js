@@ -13,7 +13,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Slider
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -193,16 +192,11 @@ export default function GradientForm({ categories }) {
               <Box sx={{ mb: 1 }}>
                 <ColorPickerCustom
                   value={startColor}
+                  alpha={startOpacity}
                   onChange={setStartColor}
+                  onAlphaChange={setStartOpacity}
                 />
               </Box>
-              <Typography gutterBottom>{t.opacity}</Typography>
-              <Slider
-                value={startOpacity}
-                min={0}
-                max={255}
-                onChange={(e, v) => setStartOpacity(v)}
-              />
             </CardContent>
           </Card>
           <Card
@@ -220,15 +214,13 @@ export default function GradientForm({ categories }) {
             />
             <CardContent>
               <Box sx={{ mb: 1 }}>
-                <ColorPickerCustom value={endColor} onChange={setEndColor} />
+                <ColorPickerCustom
+                  value={endColor}
+                  alpha={endOpacity}
+                  onChange={setEndColor}
+                  onAlphaChange={setEndOpacity}
+                />
               </Box>
-              <Typography gutterBottom>{t.opacity}</Typography>
-              <Slider
-                value={endOpacity}
-                min={0}
-                max={255}
-                onChange={(e, v) => setEndOpacity(v)}
-              />
             </CardContent>
           </Card>
         </Box>
