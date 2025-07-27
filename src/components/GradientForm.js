@@ -15,6 +15,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Slider,
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -37,7 +38,7 @@ function rgbToHex(r, g, b) {
     .toUpperCase();
 }
 
-function generateGradient(text, start, end) {
+function generateGradient(text, start, end, opacity) {
   const s = hexToRgb(start);
   const e = hexToRgb(end);
   const len = text.length;
@@ -56,7 +57,8 @@ function generateGradient(text, start, end) {
     const g = Math.round(s.g + (e.g - s.g) * t);
     const b = Math.round(s.b + (e.b - s.b) * t);
     const hex = rgbToHex(r, g, b);
-    result += `<FG${hex}FF>` + text[i];
+    const op = opacity.toString(16).padStart(2, '0').toUpperCase();
+    result += `<FG${hex}${op}>` + text[i];
   }
   return result;
 }
@@ -67,6 +69,7 @@ export default function GradientForm({ categories }) {
   const [message, setMessage] = useState('');
   const [startColor, setStartColor] = useState('#ff0000');
   const [endColor, setEndColor] = useState('#0000ff');
+  const [opacity, setOpacity] = useState(255);
   const [code, setCode] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -79,15 +82,15 @@ export default function GradientForm({ categories }) {
   }, []);
 
   useEffect(() => {
-    setCode(generateGradient(message, startColor, endColor));
-  }, [message, startColor, endColor]);
+    setCode(generateGradient(message, startColor, endColor, opacity));
+  }, [message, startColor, endColor, opacity]);
 
   const handleCopy = () => navigator.clipboard.writeText(code);
 
   const handleSave = () => {
     const newFav = [
       ...favorites,
-      { id: Date.now(), message, startColor, endColor },
+      { id: Date.now(), message, startColor, endColor, opacity },
     ];
     setFavorites(newFav);
     localStorage.setItem('owFavorites', JSON.stringify(newFav));
@@ -97,6 +100,9 @@ export default function GradientForm({ categories }) {
     setMessage(fav.message);
     setStartColor(fav.startColor);
     setEndColor(fav.endColor);
+    if (typeof fav.opacity === 'number') {
+      setOpacity(fav.opacity);
+    }
     setAnchorEl(null);
   };
 
@@ -136,43 +142,54 @@ export default function GradientForm({ categories }) {
           onChange={(e) => setMessage(e.target.value)}
           sx={{ mb: 2 }}
         />
-        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          <TextField
-            type="color"
-            label={t.startColor}
-            value={startColor}
-            onChange={(e) => setStartColor(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            type="color"
-            label={t.endColor}
-            value={endColor}
-            onChange={(e) => setEndColor(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
+        <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <TextField
+              type="color"
+              label={t.startColor}
+              value={startColor}
+              onChange={(e) => setStartColor(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+            <Box sx={{ width: 48, height: 48, bgcolor: startColor, border: 1, borderColor: 'divider' }} />
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <TextField
+              type="color"
+              label={t.endColor}
+              value={endColor}
+              onChange={(e) => setEndColor(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+            <Box sx={{ width: 48, height: 48, bgcolor: endColor, border: 1, borderColor: 'divider' }} />
+          </Box>
         </Box>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Box sx={{ mb: 2 }}>
+          <Typography gutterBottom>{t.opacity}</Typography>
+          <Slider value={opacity} min={0} max={255} onChange={(e, v) => setOpacity(v)} />
+        </Box>
+        <Grid container spacing={2} sx={{ mb: 2, flexWrap: 'nowrap', overflowX: 'auto' }}>
           {Object.entries(categories).map(([cat, items]) => (
-            <Grid item xs={12} md={3} key={cat}>
-              <Card>
+            <Grid item xs={3} key={cat}>
+              <Card sx={{ height: '100%' }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     {cat}
                   </Typography>
-                  <Grid container spacing={1}>
+                  <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
                     {items.map((item) => (
-                      <Grid item key={item.code}>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => setMessage((m) => `${m} ${item.code}`)}
-                        >
-                          {item.label}
-                        </Button>
-                      </Grid>
+                      <Button
+                        key={item.code}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setMessage((m) => `${m} ${item.code}`)}
+                        fullWidth
+                        sx={{ mb: 0.5 }}
+                      >
+                        {item.label}
+                      </Button>
                     ))}
-                  </Grid>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
@@ -230,7 +247,12 @@ export default function GradientForm({ categories }) {
               size="small"
               onClick={() =>
                 navigator.clipboard.writeText(
-                  generateGradient(fav.message, fav.startColor, fav.endColor)
+                  generateGradient(
+                    fav.message,
+                    fav.startColor,
+                    fav.endColor,
+                    typeof fav.opacity === 'number' ? fav.opacity : 255
+                  )
                 )
               }
             >
