@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Button, Popover, Paper } from '@mui/material';
+import { Box, Popover, Paper } from '@mui/material';
 import { Circle, Colorful } from '@uiw/react-color';
-import ColorLensIcon from '@mui/icons-material/ColorLens';
 
 const PRESET_COLORS = [
   '#FF6B6B',
@@ -16,7 +15,12 @@ const PRESET_COLORS = [
   '#43A047',
 ];
 
-export default function ColorPickerCustom({ value = '#1976d2', onChange }) {
+export default function ColorPickerCustom({
+  value = '#1976d2',
+  alpha = 255,
+  onChange,
+  onAlphaChange,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -40,24 +44,17 @@ export default function ColorPickerCustom({ value = '#1976d2', onChange }) {
 
       <Box display="flex" alignItems="center" gap={2}>
         <Paper
+          onClick={handleClick}
           sx={{
-            width: 45,
-            height: 45,
+            width: 60,
+            height: 60,
             backgroundColor: value,
             border: '2px solid #fff',
             boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
             borderRadius: '50%',
+            cursor: 'pointer',
           }}
         />
-
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={handleClick}
-          startIcon={<ColorLensIcon />}
-        >
-          Color personalizado
-        </Button>
 
         <Popover
           open={open}
@@ -74,12 +71,13 @@ export default function ColorPickerCustom({ value = '#1976d2', onChange }) {
         >
           <Box p={2}>
             <Colorful
-              style={{ width: 200 }}
-              color={value}
-              disableAlpha
+              style={{ width: 220 }}
+              color={`${value}${alpha.toString(16).padStart(2, '0')}`}
               onChange={(color) => {
                 onChange(color.hex);
-                handleClose();
+                if (onAlphaChange && color.hsva) {
+                  onAlphaChange(Math.round(color.hsva.a * 255));
+                }
               }}
             />
           </Box>
