@@ -12,9 +12,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   Slider,
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
@@ -22,6 +19,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { messages } from '@/i18n';
 import { ColorModeContext } from '@/theme';
+import TranslateIcon from '@mui/icons-material/Translate';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
 
 function hexToRgb(hex) {
   const h = hex.replace('#', '');
@@ -79,6 +78,12 @@ export default function GradientForm({ categories }) {
   const [code, setCode] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [langAnchor, setLangAnchor] = useState(null);
+  const [themeAnchor, setThemeAnchor] = useState(null);
+  const [error, setError] = useState('');
+  const [iconCount, setIconCount] = useState(0);
+  const [charCount, setCharCount] = useState(0);
+  const [charLimit, setCharLimit] = useState(15);
 
   useEffect(() => {
     const stored = localStorage.getItem('owFavorites');
@@ -86,6 +91,24 @@ export default function GradientForm({ categories }) {
       setFavorites(JSON.parse(stored));
     }
   }, []);
+
+  useEffect(() => {
+    const icons = (message.match(/<tx[^>]+>/gi) || []).length;
+    const textOnly = message.replace(/<tx[^>]+>/gi, '');
+    const count = textOnly.length;
+    const limits = [15, 13, 12, 10, 9];
+    const limit = limits[Math.min(icons, 4)];
+    setIconCount(icons);
+    setCharCount(count);
+    setCharLimit(limit);
+    if (icons > 4) {
+      setError(t.tooManyIcons);
+    } else if (count > limit) {
+      setError(t.charLimitExceeded);
+    } else {
+      setError('');
+    }
+  }, [message, t]);
 
   useEffect(() => {
     setCode(
@@ -141,32 +164,6 @@ export default function GradientForm({ categories }) {
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-        <FormControl sx={{ mb: 2, minWidth: 120, mr: 2 }} size="small">
-          <InputLabel id="lang-label">Lang</InputLabel>
-          <Select
-            labelId="lang-label"
-            value={lang}
-            label="Lang"
-            onChange={(e) => setLang(e.target.value)}
-          >
-            <MenuItem value="en">English</MenuItem>
-            <MenuItem value="es">Español</MenuItem>
-            <MenuItem value="ca">Català</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ mb: 2, minWidth: 120 }} size="small">
-          <InputLabel id="theme-label">{t.theme}</InputLabel>
-          <Select
-            labelId="theme-label"
-            value={colorMode.mode}
-            label={t.theme}
-            onChange={(e) => colorMode.setMode(e.target.value)}
-          >
-            <MenuItem value="system">{t.system}</MenuItem>
-            <MenuItem value="light">{t.light}</MenuItem>
-            <MenuItem value="dark">{t.dark}</MenuItem>
-          </Select>
-        </FormControl>
         <Typography variant="body1" sx={{ mb: 2 }}>
           {t.explanation}
         </Typography>
@@ -178,6 +175,10 @@ export default function GradientForm({ categories }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           sx={{ mb: 2 }}
+          error={Boolean(error)}
+          helperText={
+            error || `${iconCount} ${t.icons}, ${charCount}/${charLimit} ${t.chars}`
+          }
         />
         <Box sx={{ display: 'flex', gap: 4, mb: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -275,6 +276,7 @@ export default function GradientForm({ categories }) {
             variant="contained"
             onClick={handleCopy}
             startIcon={<ContentCopyIcon />}
+            disabled={Boolean(error)}
           >
             {t.copy}
           </Button>
@@ -282,6 +284,7 @@ export default function GradientForm({ categories }) {
             variant="outlined"
             onClick={handleSave}
             startIcon={<StarIcon />}
+            disabled={Boolean(error)}
           >
             {t.save}
           </Button>
@@ -337,6 +340,34 @@ export default function GradientForm({ categories }) {
           </MenuItem>
         ))}
       </Menu>
+      <Box
+        sx={{ position: 'fixed', bottom: 16, right: 16, display: 'flex', flexDirection: 'column', gap: 1 }}
+      >
+        <IconButton size="small" onClick={(e) => setLangAnchor(e.currentTarget)}>
+          <TranslateIcon fontSize="inherit" />
+        </IconButton>
+        <Menu
+          anchorEl={langAnchor}
+          open={Boolean(langAnchor)}
+          onClose={() => setLangAnchor(null)}
+        >
+          <MenuItem onClick={() => { setLang('en'); setLangAnchor(null); }}>English</MenuItem>
+          <MenuItem onClick={() => { setLang('es'); setLangAnchor(null); }}>Español</MenuItem>
+          <MenuItem onClick={() => { setLang('ca'); setLangAnchor(null); }}>Català</MenuItem>
+        </Menu>
+        <IconButton size="small" onClick={(e) => setThemeAnchor(e.currentTarget)}>
+          <Brightness4Icon fontSize="inherit" />
+        </IconButton>
+        <Menu
+          anchorEl={themeAnchor}
+          open={Boolean(themeAnchor)}
+          onClose={() => setThemeAnchor(null)}
+        >
+          <MenuItem onClick={() => { colorMode.setMode('system'); setThemeAnchor(null); }}>{t.system}</MenuItem>
+          <MenuItem onClick={() => { colorMode.setMode('light'); setThemeAnchor(null); }}>{t.light}</MenuItem>
+          <MenuItem onClick={() => { colorMode.setMode('dark'); setThemeAnchor(null); }}>{t.dark}</MenuItem>
+        </Menu>
+      </Box>
     </Container>
   );
 }

@@ -16,6 +16,10 @@ export const messages = {
     save: 'Save favorite',
     favorites: 'Favorites',
     noFavorites: 'No favorites saved',
+    icons: 'icons',
+    chars: 'chars',
+    tooManyIcons: 'Maximum 4 icons allowed',
+    charLimitExceeded: 'Character limit exceeded',
   },
   es: {
     explanation: 'Gracias a @spinsp7 por la lista de iconos.',
@@ -34,6 +38,10 @@ export const messages = {
     save: 'Guardar en favoritos',
     favorites: 'Favoritos',
     noFavorites: 'No hay favoritos guardados',
+    icons: 'iconos',
+    chars: 'caracteres',
+    tooManyIcons: 'Máximo 4 iconos permitidos',
+    charLimitExceeded: 'Se superó el límite de caracteres',
   },
   ca: {
     explanation: "Gràcies a @spinsp7 per la llista d'icones.",
@@ -52,5 +60,9 @@ export const messages = {
     save: 'Desa als favorits',
     favorites: 'Favorits',
     noFavorites: 'No hi ha favorits guardats',
+    icons: 'icones',
+    chars: 'caràcters',
+    tooManyIcons: 'Màxim 4 icones permeses',
+    charLimitExceeded: 'S\'ha superat el límit de caràcters',
   },
 };
