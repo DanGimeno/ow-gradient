@@ -249,16 +249,33 @@ export default function GradientForm({ categories }) {
                     />
                     <CardContent sx={{ maxHeight: 200, overflowY: "auto" }}>
                       {items.map((item) => (
-                        <Button
-                          key={item.code}
-                          fullWidth
-                          size="small"
-                          variant="outlined"
-                          sx={{ mb: 0.5 }}
-                          onClick={() => setMessage((m) => `${m} ${item.code}`)}
-                        >
-                          {item.label}
-                        </Button>
+                        <Box key={item.code} sx={{ display: "flex", mb: 0.5 }}>
+                          <Button
+                            fullWidth
+                            size="small"
+                            variant="outlined"
+                            onClick={() =>
+                              setMessage((m) => `${m} ${item.code}`)
+                            }
+                          >
+                            {item.label}
+                          </Button>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            onClick={() =>
+                              navigator.clipboard.writeText(item.code)
+                            }
+                            sx={{
+                              minWidth: 0,
+                              width: (theme) => theme.spacing(4.5),
+                              ml: 0.5,
+                            }}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </Button>
+                        </Box>
                       ))}
                     </CardContent>
                   </Card>
