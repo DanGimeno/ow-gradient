@@ -144,6 +144,7 @@ export default function GradientForm({ categories }) {
     setFavorites(filtered);
     localStorage.setItem("owFavorites", JSON.stringify(filtered));
   };
+  const anchoColor = 250;
 
   return (
     <Container maxWidth="xl">
@@ -167,7 +168,7 @@ export default function GradientForm({ categories }) {
       </Box>
       <Box sx={{ my: 4 }}>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <Stack spacing={2}>
               <Card
                 sx={{
@@ -175,61 +176,61 @@ export default function GradientForm({ categories }) {
                   borderColor: "primary.main",
                   minHeight: 250,
                   height: 250,
-                    maxHeight: 250,
-                    minWidth: { xs: 380, sm: 650 },
-                  }}
-                  elevation={0}
-                >
-                  <CardHeader
-                    title={t.startColor}
-                    sx={{
-                      bgcolor: "primary.main",
-                      color: "primary.contrastText",
-                      textAlign: "center",
-                      p: 1,
-                    }}
-                  />
-                  <CardContent>
-                    <ColorPickerCustom
-                      value={startColor}
-                      alpha={startOpacity}
-                      onChange={setStartColor}
-                      onAlphaChange={setStartOpacity}
-                    />
-                  </CardContent>
-                </Card>
-              <Card
+                  maxHeight: 250,
+                  minWidth: { xs: 380, sm: anchoColor },
+                }}
+                elevation={0}
+              >
+                <CardHeader
+                  title={t.startColor}
                   sx={{
-                    border: 1,
-                    borderColor: "primary.main",
-                    minHeight: 250,
-                    height: 250,
-                    maxHeight: 250,
-                    minWidth: { xs: 380, sm: 650 },
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                    textAlign: "center",
+                    p: 1,
                   }}
-                  elevation={0}
-                >
-                  <CardHeader
-                    title={t.endColor}
-                    sx={{
-                      bgcolor: "primary.main",
-                      color: "primary.contrastText",
-                      textAlign: "center",
-                      p: 1,
-                    }}
+                />
+                <CardContent>
+                  <ColorPickerCustom
+                    value={startColor}
+                    alpha={startOpacity}
+                    onChange={setStartColor}
+                    onAlphaChange={setStartOpacity}
                   />
-                  <CardContent>
-                    <ColorPickerCustom
-                      value={endColor}
-                      alpha={endOpacity}
-                      onChange={setEndColor}
-                      onAlphaChange={setEndOpacity}
-                    />
-                  </CardContent>
-                </Card>
+                </CardContent>
+              </Card>
+              <Card
+                sx={{
+                  border: 1,
+                  borderColor: "primary.main",
+                  minHeight: 250,
+                  height: 250,
+                  maxHeight: 250,
+                  minWidth: { xs: 380, sm: anchoColor },
+                }}
+                elevation={0}
+              >
+                <CardHeader
+                  title={t.endColor}
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                    textAlign: "center",
+                    p: 1,
+                  }}
+                />
+                <CardContent>
+                  <ColorPickerCustom
+                    value={endColor}
+                    alpha={endOpacity}
+                    onChange={setEndColor}
+                    onAlphaChange={setEndOpacity}
+                  />
+                </CardContent>
+              </Card>
             </Stack>
           </Grid>
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: 9 }}>
             <Grid container spacing={2}>
               {Object.entries(categories).map(([cat, items]) => (
                 <Grid key={cat} size={{ xs: 12, sm: 6 }}>
@@ -246,9 +247,7 @@ export default function GradientForm({ categories }) {
                         p: 1,
                       }}
                     />
-                    <CardContent
-                      sx={{ maxHeight: 200, maxWidth: 400, overflowY: "auto" }}
-                    >
+                    <CardContent sx={{ maxHeight: 200, overflowY: "auto" }}>
                       {items.map((item) => (
                         <Button
                           key={item.code}
