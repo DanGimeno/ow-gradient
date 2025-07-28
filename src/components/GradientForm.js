@@ -177,7 +177,7 @@ export default function GradientForm({ categories }) {
                 minHeight: 250,
                 height: 250,
                 maxHeight: 250,
-                minWidth: 650,
+                minWidth: { xs: 380, sm: 650 },
               }}
               elevation={0}
             >
@@ -248,7 +248,7 @@ export default function GradientForm({ categories }) {
                 minHeight: 250,
                 height: 250,
                 maxHeight: 250,
-                minWidth: 650,
+                minWidth: { xs: 380, sm: 650 },
               }}
               elevation={0}
             >
