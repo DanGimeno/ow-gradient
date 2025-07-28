@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Popover,
@@ -30,6 +30,29 @@ export default function ColorPickerCustom({
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const [recentColors, setRecentColors] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("owRecentColors");
+    if (stored) {
+      try {
+        setRecentColors(JSON.parse(stored));
+      } catch {}
+    }
+  }, []);
+
+  const updateRecent = (color) => {
+    setRecentColors((prev) => {
+      const arr = [color, ...prev.filter((c) => c !== color)].slice(0, 10);
+      localStorage.setItem("owRecentColors", JSON.stringify(arr));
+      return arr;
+    });
+  };
+
+  const handleColorChange = (hex) => {
+    onChange(hex);
+    updateRecent(hex);
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +98,7 @@ export default function ColorPickerCustom({
                   style={{ width: 220 }}
                   color={`${value}${alpha.toString(16).padStart(2, "0")}`}
                   onChange={(color) => {
-                    onChange(color.hex);
+                    handleColorChange(color.hex);
                     if (onAlphaChange && color.hsva) {
                       onAlphaChange(Math.round(color.hsva.a * 255));
                     }
@@ -90,12 +113,15 @@ export default function ColorPickerCustom({
                 size="small"
                 name="rgb"
                 label="RGB"
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">#</InputAdornment>
-                    ),
-                  },
+                value={value.replace("#", "").toUpperCase()}
+                onChange={(e) => {
+                  const hex = `#${e.target.value.replace(/[^0-9a-f]/gi, "").slice(0, 6).toUpperCase()}`;
+                  handleColorChange(hex);
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">#</InputAdornment>
+                  ),
                 }}
                 sx={{ width: 120 }}
               />
@@ -103,6 +129,13 @@ export default function ColorPickerCustom({
                 size="small"
                 name="alpha"
                 label="Alpha"
+                type="number"
+                value={alpha}
+                onChange={(e) => {
+                  const a = Math.max(0, Math.min(255, parseInt(e.target.value || 0, 10)));
+                  onAlphaChange?.(a);
+                }}
+                inputProps={{ min: 0, max: 255 }}
                 sx={{ width: 70 }}
               />
             </Stack>
@@ -113,9 +146,18 @@ export default function ColorPickerCustom({
         <Circle
           colors={PRESET_COLORS}
           color={value}
-          onChange={(color) => onChange(color.hex)}
+          onChange={(color) => handleColorChange(color.hex)}
         />
       </Box>
+      {recentColors.length > 0 && (
+        <Box mb={2}>
+          <Circle
+            colors={recentColors}
+            color={value}
+            onChange={(color) => handleColorChange(color.hex)}
+          />
+        </Box>
+      )}
     </Box>
   );
 }
