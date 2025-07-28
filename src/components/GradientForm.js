@@ -10,6 +10,7 @@ import {
   CardHeader,
   Typography,
   Grid,
+  Stack,
   IconButton,
   Menu,
   MenuItem,
@@ -23,7 +24,6 @@ import { ColorModeContext } from "@/theme";
 import TranslateIcon from "@mui/icons-material/Translate";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import ColorPickerCustom from "./ColorPickerCustom";
-import { Height } from "@mui/icons-material";
 
 function hexToRgb(hex) {
   const h = hex.replace("#", "");
@@ -167,15 +167,14 @@ export default function GradientForm({ categories }) {
       </Box>
       <Box sx={{ my: 4 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <Grid container spacing={2} direction="column">
-              <Grid item>
-                <Card
-                  sx={{
-                    border: 1,
-                    borderColor: "primary.main",
-                    minHeight: 250,
-                    height: 250,
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Stack spacing={2}>
+              <Card
+                sx={{
+                  border: 1,
+                  borderColor: "primary.main",
+                  minHeight: 250,
+                  height: 250,
                     maxHeight: 250,
                     minWidth: { xs: 380, sm: 650 },
                   }}
@@ -199,9 +198,7 @@ export default function GradientForm({ categories }) {
                     />
                   </CardContent>
                 </Card>
-              </Grid>
-              <Grid item>
-                <Card
+              <Card
                   sx={{
                     border: 1,
                     borderColor: "primary.main",
@@ -230,13 +227,12 @@ export default function GradientForm({ categories }) {
                     />
                   </CardContent>
                 </Card>
-              </Grid>
-            </Grid>
+            </Stack>
           </Grid>
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Grid container spacing={2}>
               {Object.entries(categories).map(([cat, items]) => (
-                <Grid item xs={12} sm={6} key={cat}>
+                <Grid key={cat} size={{ xs: 12, sm: 6 }}>
                   <Card
                     sx={{ border: 1, borderColor: "primary.main" }}
                     elevation={0}
