@@ -13,6 +13,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Divider,
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -22,6 +23,7 @@ import { ColorModeContext } from "@/theme";
 import TranslateIcon from "@mui/icons-material/Translate";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import ColorPickerCustom from "./ColorPickerCustom";
+import { Height } from "@mui/icons-material";
 
 function hexToRgb(hex) {
   const h = hex.replace("#", "");
@@ -44,7 +46,7 @@ function generateGradient(text, start, end, startOpacity, endOpacity) {
   const e = hexToRgb(end);
   const len = text.length;
   let result = "";
-  for (let i = 0; i < len; i += 1) {
+  for (let i = 0; i < len; i++) {
     if (text[i] === "<") {
       const j = text.indexOf(">", i);
       if (j !== -1) {
@@ -58,9 +60,11 @@ function generateGradient(text, start, end, startOpacity, endOpacity) {
     const g = Math.round(s.g + (e.g - s.g) * t);
     const b = Math.round(s.b + (e.b - s.b) * t);
     const hex = rgbToHex(r, g, b);
-    const opVal = Math.round(startOpacity + (endOpacity - startOpacity) * t);
-    const op = opVal.toString(16).padStart(2, "0").toUpperCase();
-    result += `<FG${hex}${op}>` + text[i];
+    const alpha = Math.round(startOpacity + (endOpacity - startOpacity) * t)
+      .toString(16)
+      .padStart(2, "0")
+      .toUpperCase();
+    result += `<FG${hex}${alpha}>${text[i]}`;
   }
   return result;
 }
@@ -86,9 +90,7 @@ export default function GradientForm({ categories }) {
 
   useEffect(() => {
     const stored = localStorage.getItem("owFavorites");
-    if (stored) {
-      setFavorites(JSON.parse(stored));
-    }
+    if (stored) setFavorites(JSON.parse(stored));
   }, []);
 
   useEffect(() => {
@@ -96,17 +98,13 @@ export default function GradientForm({ categories }) {
     const textOnly = message.replace(/<tx[^>]+>/gi, "");
     const count = textOnly.length;
     const limits = [15, 13, 12, 10, 9];
-    const limit = limits[Math.min(icons, 4)];
+    const limit = limits[Math.min(icons, limits.length - 1)];
     setIconCount(icons);
     setCharCount(count);
     setCharLimit(limit);
-    if (icons > 4) {
-      setError(t.tooManyIcons);
-    } else if (count > limit) {
-      setError(t.charLimitExceeded);
-    } else {
-      setError("");
-    }
+    setError(
+      icons > 4 ? t.tooManyIcons : count > limit ? t.charLimitExceeded : ""
+    );
   }, [message, t]);
 
   useEffect(() => {
@@ -116,7 +114,6 @@ export default function GradientForm({ categories }) {
   }, [message, startColor, endColor, startOpacity, endOpacity]);
 
   const handleCopy = () => navigator.clipboard.writeText(code);
-
   const handleSave = () => {
     const newFav = [
       ...favorites,
@@ -137,22 +134,16 @@ export default function GradientForm({ categories }) {
     setMessage(fav.message);
     setStartColor(fav.startColor);
     setEndColor(fav.endColor);
-    if (typeof fav.startOpacity === "number") {
-      setStartOpacity(fav.startOpacity);
-    }
-    if (typeof fav.endOpacity === "number") {
-      setEndOpacity(fav.endOpacity);
-    }
+    if (typeof fav.startOpacity === "number") setStartOpacity(fav.startOpacity);
+    if (typeof fav.endOpacity === "number") setEndOpacity(fav.endOpacity);
     setAnchorEl(null);
   };
 
   const handleDeleteFavorite = (fav) => {
-    const newFav = favorites.filter((f) => f.id !== fav.id);
-    setFavorites(newFav);
-    localStorage.setItem("owFavorites", JSON.stringify(newFav));
+    const filtered = favorites.filter((f) => f.id !== fav.id);
+    setFavorites(filtered);
+    localStorage.setItem("owFavorites", JSON.stringify(filtered));
   };
-
-  const openMenu = Boolean(anchorEl);
 
   return (
     <Container maxWidth="xl">
@@ -167,112 +158,159 @@ export default function GradientForm({ categories }) {
           minRows={2}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          sx={{ mb: 2 }}
           error={Boolean(error)}
           helperText={
             error ||
             `${iconCount} ${t.icons}, ${charCount}/${charLimit} ${t.chars}`
           }
         />
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <Card
-            sx={{ flex: 1, border: 1, borderColor: "primary.main" }}
-            elevation={0}
-          >
-            <CardHeader
-              title={t.startColor}
+      </Box>
+      <Box sx={{ my: 4 }}>
+        <Grid container spacing={2}>
+          {/* Fila 1 */}
+          <Grid item xs={12} sm={4}>
+            {/* Start Color */}
+            <Card
               sx={{
-                bgcolor: "primary.main",
-                color: "primary.contrastText",
-                p: 1,
-                textAlign: "center",
+                border: 1,
+                borderColor: "primary.main",
+                minHeight: 250,
+                height: 250,
+                maxHeight: 250,
+                minWidth: 650,
               }}
-            />
-            <CardContent>
-              <Box sx={{ mb: 1 }}>
+              elevation={0}
+            >
+              <CardHeader
+                title={t.startColor}
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  textAlign: "center",
+                  p: 1,
+                }}
+              />
+              <CardContent>
                 <ColorPickerCustom
                   value={startColor}
                   alpha={startOpacity}
                   onChange={setStartColor}
                   onAlphaChange={setStartOpacity}
                 />
-              </Box>
-            </CardContent>
-          </Card>
-          <Card
-            sx={{ flex: 1, border: 1, borderColor: "primary.main" }}
-            elevation={0}
-          >
-            <CardHeader
-              title={t.endColor}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {Object.entries(categories)
+            .slice(0, 2) // primeras 2 categorías
+            .map(([cat, items]) => (
+              <Grid item xs={12} sm={4} key={cat}>
+                <Card
+                  sx={{ border: 1, borderColor: "primary.main" }}
+                  elevation={0}
+                >
+                  <CardHeader
+                    title={cat}
+                    sx={{
+                      bgcolor: "primary.main",
+                      color: "primary.contrastText",
+                      textAlign: "center",
+                      p: 1,
+                    }}
+                  />
+                  <CardContent
+                    sx={{ maxHeight: 200, maxWidth: 400, overflowY: "auto" }}
+                  >
+                    {items.map((item) => (
+                      <Button
+                        key={item.code}
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        sx={{ mb: 0.5 }}
+                        onClick={() => setMessage((m) => `${m} ${item.code}`)}
+                      >
+                        {item.label}
+                      </Button>
+                    ))}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+
+          {/* Fila 2 */}
+          <Grid item xs={12} sm={4}>
+            {/* End Color */}
+            <Card
               sx={{
-                bgcolor: "primary.main",
-                color: "primary.contrastText",
-                p: 1,
-                textAlign: "center",
+                border: 1,
+                borderColor: "primary.main",
+                minHeight: 250,
+                height: 250,
+                maxHeight: 250,
+                minWidth: 650,
               }}
-            />
-            <CardContent>
-              <Box sx={{ mb: 1 }}>
+              elevation={0}
+            >
+              <CardHeader
+                title={t.endColor}
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  textAlign: "center",
+                  p: 1,
+                }}
+              />
+              <CardContent>
                 <ColorPickerCustom
                   value={endColor}
                   alpha={endOpacity}
                   onChange={setEndColor}
                   onAlphaChange={setEndOpacity}
                 />
-              </Box>
-            </CardContent>
-          </Card>
-        </Box>
-        <Grid container spacing={2} columns={24} sx={{ mb: 2 }}>
-          {Object.entries(categories).map(([cat, items]) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              xl={2}
-              key={cat}
-              sx={{ minWidth: 200, maxWidth: 360 }}
-            >
-              <Card
-                sx={{
-                  width: "100%",
-                  border: 1,
-                  borderColor: "primary.main",
-                }}
-                elevation={0}
-              >
-                <CardHeader
-                  title={cat}
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    p: 1,
-                    textAlign: "center",
-                  }}
-                />
-                <CardContent sx={{ pt: 1 }}>
-                  <Box sx={{ maxHeight: 200, overflowY: "auto" }}>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {Object.entries(categories)
+            .slice(2, 4) // siguientes 2 categorías
+            .map(([cat, items]) => (
+              <Grid item xs={12} sm={4} key={cat}>
+                <Card
+                  sx={{ border: 1, borderColor: "primary.main" }}
+                  elevation={0}
+                >
+                  <CardHeader
+                    title={cat}
+                    sx={{
+                      bgcolor: "primary.main",
+                      color: "primary.contrastText",
+                      textAlign: "center",
+                      p: 1,
+                    }}
+                  />
+                  <CardContent
+                    sx={{ maxHeight: 200, maxWidth: 400, overflowY: "auto" }}
+                  >
                     {items.map((item) => (
                       <Button
                         key={item.code}
+                        fullWidth
                         size="small"
                         variant="outlined"
-                        onClick={() => setMessage((m) => `${m} ${item.code}`)}
-                        fullWidth
                         sx={{ mb: 0.5 }}
+                        onClick={() => setMessage((m) => `${m} ${item.code}`)}
                       >
                         {item.label}
                       </Button>
                     ))}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
         </Grid>
+      </Box>
+      <Box sx={{ my: 4 }}>
         <TextField
           label={t.generatedCode}
           fullWidth
@@ -309,7 +347,7 @@ export default function GradientForm({ categories }) {
       </IconButton>
       <Menu
         anchorEl={anchorEl}
-        open={openMenu}
+        open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
         <Typography sx={{ px: 2, py: 1 }} variant="subtitle1">
@@ -329,10 +367,8 @@ export default function GradientForm({ categories }) {
                     fav.message,
                     fav.startColor,
                     fav.endColor,
-                    typeof fav.startOpacity === "number"
-                      ? fav.startOpacity
-                      : 255,
-                    typeof fav.endOpacity === "number" ? fav.endOpacity : 255
+                    fav.startOpacity,
+                    fav.endOpacity
                   )
                 )
               }
@@ -359,7 +395,7 @@ export default function GradientForm({ categories }) {
           size="small"
           onClick={(e) => setLangAnchor(e.currentTarget)}
         >
-          <TranslateIcon fontSize="inherit" />
+          <TranslateIcon />
         </IconButton>
         <Menu
           anchorEl={langAnchor}
@@ -395,7 +431,7 @@ export default function GradientForm({ categories }) {
           size="small"
           onClick={(e) => setThemeAnchor(e.currentTarget)}
         >
-          <Brightness4Icon fontSize="inherit" />
+          <Brightness4Icon />
         </IconButton>
         <Menu
           anchorEl={themeAnchor}
